@@ -210,7 +210,7 @@ if __name__=='__main__':
         print(df_cust_test.duplicated().sum())
 
 
-        obj3.save_data_into_feature_store(df=df_cust_test)
-        obj3.train_test_splitter(df=df_cust_test)
+        # obj3.save_data_into_feature_store(df=df_cust_test)
+        # obj3.train_test_splitter(df=df_cust_test)
     except Exception as e:
         print(CustomException(e, sys))
