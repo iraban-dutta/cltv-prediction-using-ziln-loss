@@ -84,6 +84,9 @@ class DataIngestion:
             # Merging
             df_cust_lvl = pd.merge(pd.merge(df_cust_first_purchase_attr, df_cust_first_purchase_val, on='id', how='left'), df_cust_ltv_1y, on='id', how='left')
             
+            # Filtering out outliers
+            cltv_uppcap = df_cust_lvl['cltv'].quantile(0.99995)
+            df_cust_lvl = df_cust_lvl.query(f'cltv<{cltv_uppcap}').copy()
 
             # Extracting some basic features
             df_cust_lvl['start_month'] = df_cust_lvl['start_date'].dt.month
@@ -196,9 +199,10 @@ class DataIngestion:
 
 if __name__=='__main__':
     try:
-        obj1 = TrainingPipelineConfig(company_id=103800030)
-        obj2 = DataIngestionConfig(company_id=103800030, training_pipeline_config=obj1)
-        obj3 = DataIngestion(company_id=103800030, data_ingestion_config=obj2)
+        company_id=103800030
+        obj1 = TrainingPipelineConfig(company_id=company_id)
+        obj2 = DataIngestionConfig(company_id=company_id, training_pipeline_config=obj1)
+        obj3 = DataIngestion(company_id=company_id, data_ingestion_config=obj2)
 
         df_txn_test = obj3.import_txn_table_as_df()
         print(df_txn_test.shape)
