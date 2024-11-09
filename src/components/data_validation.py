@@ -6,7 +6,7 @@ from scipy.stats import ks_2samp
 from src.utils.main_utils.utils import read_yaml_file, write_yaml_file
 from src.constant.training_pipeline_constants import SCHEMA_FILE_PATH
 from src.entity.config_entity import TrainingPipelineConfig, DataValidationConfig
-from src.entity.artifact_entity import DataIngestionArtifact, DataValidationnArtifact
+from src.entity.artifact_entity import DataIngestionArtifact, DataValidationArtifact
 from src.logging.logger import logging 
 from src.exception.exception import CustomException
 
@@ -43,6 +43,18 @@ class DataValidation:
 
 
     def validate_num_of_cols(self, df:pd.DataFrame)->bool:
+        """
+        Validates if the number of columns in the input DataFrame matches the expected schema.
+
+        Compares the number of columns in the provided DataFrame with the expected number of columns 
+        defined in the schema configuration.
+
+        Args:
+            df (pd.DataFrame): The DataFrame whose column count is to be validated.
+
+        Returns:
+            bool: True if the number of columns matches the expected schema, False otherwise.
+        """
         try:
             number_of_columns=len(self._schema_config['columns'])
             logging.info(f"Required number of columns:{number_of_columns}")
@@ -55,6 +67,21 @@ class DataValidation:
 
 
     def detect_data_drift(self, df_base:pd.DataFrame, df_curr:pd.DataFrame, threshold:float=0.05)->bool:
+        """
+        Detects data drift by comparing numerical columns in two datasets using the Kolmogorov-Smirnov test.
+
+        This method compares the base and current datasets' numerical columns to identify any drift 
+        in the data. It returns a boolean value indicating whether any drift is detected based on the 
+        specified threshold.
+
+        Args:
+            df_base (pd.DataFrame): The original dataset to compare against.
+            df_curr (pd.DataFrame): The current dataset to check for drift.
+            threshold (float, optional): The p-value threshold for detecting drift. Default is 0.05.
+
+        Returns:
+            bool: True if data drift is detected in any numerical column, False otherwise.
+        """
         try:
             drift_status=[]
             drift_found=False
@@ -92,7 +119,18 @@ class DataValidation:
 
 
 
-    def initiate_data_validation(self)->DataValidationnArtifact:
+    def initiate_data_validation(self)->DataValidationArtifact:
+        """
+        Executes the data validation process for the training and testing datasets.
+
+        This method validates the number of columns, checks for data drift between the training 
+        and testing datasets, and saves the validated data. It returns an artifact containing 
+        the validation status and file paths for both valid and invalid data.
+
+        Returns:
+            DataValidationArtifact: An object containing the validation status and file paths 
+            for the valid and invalid training and testing datasets.
+        """
         try:
             logging.info("Data Validation initiated.")
 
@@ -150,7 +188,7 @@ class DataValidation:
                 df_test.to_csv(path_or_buf=self.data_validation_config.invalid_testing_file_path, index=False, header=True)
 
 
-            data_validation_artifact = DataValidationnArtifact(
+            data_validation_artifact = DataValidationArtifact(
                 validation_status=(train_num_col_status and test_num_col_status and ~drift_status),
                 valid_train_file_path=self.data_validation_config.valid_training_file_path,
                 valid_test_file_path=self.data_validation_config.valid_testing_file_path,

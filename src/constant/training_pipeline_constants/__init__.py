@@ -32,8 +32,6 @@ DATA_INGESTION_FEATURE_STORE_DIR: str = "feature_store"
 DATA_INGESTION_INGESTED_DIR: str = "ingested"
 
 
-
-
 """
 Data Validation related constant start with DATA_VALIDATION VAR NAME
 """
@@ -43,3 +41,14 @@ DATA_VALIDATION_INVALID_DIR: str = "invalid"
 DATA_VALIDATION_DRIFT_REPORT_DIR: str = "drift_report"
 DATA_VALIDATION_DRIFT_REPORT_FILE_NAME: str = "report_{}.yaml"
 
+
+
+"""
+Data Transformation related constant start with DATA_TRANSFORMATION VAR NAME
+"""
+DATA_TRANSFORMATION_DIR: str = "data_transformation"
+DATA_TRANSFORMATION_TRANSFORMED_DATA_DIR: str = "transformed"
+DATA_TRANSFORMATION_TRANSFORMED_OBJECT_DIR: str = "transformed_object"
+DATA_TRANSFORMATION_PREPROCESS_OBJ_FILE_NAME = "preprocessing_{}.pkl"
+DATA_TRANSFORMATION_TRAIN_FILE_NAME: str = "train_{}.npy"
+DATA_TRANSFORMATION_TEST_FILE_NAME: str = "test_{}.npy"

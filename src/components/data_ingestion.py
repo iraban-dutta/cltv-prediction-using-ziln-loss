@@ -27,9 +27,17 @@ class DataIngestion:
             print(CustomException(e, sys))
 
     def import_txn_table_as_df(self)->pd.DataFrame:
-        '''
-        Reads postgres table from DB and loads it into a DF
-        '''
+        """
+        Reads transaction data from a PostgreSQL database and loads it into a pandas DataFrame.
+
+        This method connects to a PostgreSQL database using the provided connection string, 
+        executes a query to fetch transaction data, processes the data (removes duplicates, 
+        converts the 'date' column to datetime, and replaces 'na' values with NaN), 
+        and returns the resulting DataFrame.
+
+        Returns:
+            pd.DataFrame: A DataFrame containing the transaction data from the database.
+        """
         try:
             logging.info("Started reading table from postgres DB.")
             engine = create_engine(self.data_ingestion_config.psql_engine_string)
@@ -49,13 +57,20 @@ class DataIngestion:
 
 
     def process_df_txn_to_customer_lvl(self, df:pd.DataFrame)->pd.DataFrame:
-        '''
-        Aggregates the dataset from the txn level to the customer level
+        """
+        Aggregates transaction-level data to customer-level data with CLTV features.
+
+        This method processes a transaction-level dataset to generate a customer-level
+        dataset by aggregating the cltv for a 1 year horizion from the first purchase date.
+        It also extracts the first purchase details like item department, brand, category, etc.
+
         Args:
-            df: DF @ Transaction level,
+            df (pd.DataFrame): Input DataFrame at the transaction level.
+
         Returns:
-            pd.DataFrame: DF @ Customer level with CLTV values,
-        '''
+            pd.DataFrame: Output DataFrame at the customer level with aggregated features 
+            and calculated CLTV values.
+        """
         try:
             logging.info("Started aggregating table from txn level to customer level.")
             # Get the start date for each customer
@@ -99,7 +114,7 @@ class DataIngestion:
 
 
             # Fill missing values
-            df_cust_lvl.fillna(0, inplace=True)
+            df_cust_lvl.fillna({'cltv':0}, inplace=True)
 
             # Fix column data types
             df_cust_lvl['first_purchase_chain'] = df_cust_lvl['first_purchase_chain'].astype('category')
@@ -117,13 +132,15 @@ class DataIngestion:
 
 
     def save_data_into_feature_store(self, df:pd.DataFrame)->None:
-        '''
-        Save data into the feature store
+        """
+        Saves the given DataFrame into the feature store as a CSV file.
+
         Args:
-            df: DF that needs to be saved,
+            df (pd.DataFrame): The DataFrame to be saved into the feature store.
+
         Returns:
-            None,
-        '''
+            None
+        """
         try:
             logging.info("Started saving raw_data into the feature store.")
             feature_store_file_path = self.data_ingestion_config.feature_store_file_path
@@ -136,13 +153,15 @@ class DataIngestion:
 
 
     def train_test_splitter(self, df:pd.DataFrame)->None:
-        '''
-        Perfroms train-test split
+        """
+        Splits the input DataFrame into training and testing datasets and saves them as CSV files.
+
         Args:
-            df: DF to perfrom train-test split on,
+            df (pd.DataFrame): The input DataFrame to perform train-test split on.
+
         Returns:
-            None,
-        '''
+            None
+        """
         try:
             # Performing train-test split
             logging.info("Started train-test split.")
@@ -172,13 +191,15 @@ class DataIngestion:
 
 
     def initiate_data_ingestion(self)->DataIngestionArtifact:
-        '''
-        Run the data ingestion pipeline
-        Args:
-            None,
+        """
+        Executes the data ingestion process, importing, processing, and splitting the dataset.
+
+        This method reads the raw transaction data, processes it to a customer level, saves 
+        the processed data to a feature store, and performs a train-test split.
+
         Returns:
-            DataIngestionArtifact: Object of the class DataIngestionArtifact storing the train and test file path,
-        '''
+            DataIngestionArtifact: An object containing file paths to the train and test datasets.
+        """
         try:
             logging.info("Data Ingestion initiated.")
 
