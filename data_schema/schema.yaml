@@ -1,0 +1,29 @@
+columns:
+- first_purchase_chain: category
+- first_purchase_dept: category
+- first_purchase_category: category
+- first_purchase_brand: category
+- start_month: int32
+- start_day_isweekend: int64
+- first_purchase_amount_log: float64
+- first_purchase_txns_cnt: int64
+- first_purchase_productsize: float64
+- first_purchase_amount: float64
+- cltv: float64
+
+
+numerical_columns:
+- start_month
+- start_day_isweekend
+- first_purchase_amount_log
+- first_purchase_txns_cnt
+- first_purchase_productsize
+- first_purchase_amount
+- cltv
+
+
+categorical_columns:
+- first_purchase_chain
+- first_purchase_dept
+- first_purchase_category
+- first_purchase_brand
