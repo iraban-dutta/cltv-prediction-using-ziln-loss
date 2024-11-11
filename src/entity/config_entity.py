@@ -11,6 +11,7 @@ class TrainingPipelineConfig:
         self.artifact_dir_name = os.path.join(training_pipeline_constants.ARTIFACT_DIR, self.run_name)
 
 
+
 class DataIngestionConfig:
     def __init__(self, company_id:int, training_pipeline_config:TrainingPipelineConfig):
 
@@ -45,7 +46,6 @@ class DataIngestionConfig:
                 training_pipeline_constants.TEST_FILE_NAME.format(company_id)
             )
         
-
 
 
 class DataValidationConfig:
@@ -86,7 +86,6 @@ class DataValidationConfig:
 
 
 
-
 class DataTransformationConfig:
     def __init__(self, company_id:int, training_pipeline_config:TrainingPipelineConfig):
         self.data_transformation_dir: str = os.path.join(
@@ -101,23 +100,50 @@ class DataTransformationConfig:
         self.transformed_training_file_path: str = os.path.join(
             self.data_transformation_dir,
             training_pipeline_constants.DATA_TRANSFORMATION_TRANSFORMED_DATA_DIR,
-            training_pipeline_constants.DATA_TRANSFORMATION_TRAIN_FILE_NAME.format(company_id).replace('.csv', '.npy')
+            training_pipeline_constants.DATA_TRANSFORMATION_TRAIN_FILE_NAME.format(company_id)
         )
         self.transformed_testing_file_path: str = os.path.join(
             self.data_transformation_dir,
             training_pipeline_constants.DATA_TRANSFORMATION_TRANSFORMED_DATA_DIR,
-            training_pipeline_constants.DATA_TRANSFORMATION_TEST_FILE_NAME.format(company_id).replace('.csv', '.npy')
+            training_pipeline_constants.DATA_TRANSFORMATION_TEST_FILE_NAME.format(company_id)
+        )        
+
+
+
+class ModelTrainerConfig:
+    def __init__(self, company_id:int, training_pipeline_config:TrainingPipelineConfig):
+        self.model_trainer_dir: str = os.path.join(
+            training_pipeline_config.artifact_dir_name,
+            training_pipeline_constants.MODEL_TRAINER_DIR
         )
-        
+        self.report_metrics_file_path: str = os.path.join(
+            self.model_trainer_dir,
+            training_pipeline_constants.MODEL_TRAINER_METRICS_DIR,
+            training_pipeline_constants.MODEL_TRAINER_METRICS_REPORT_FILE_NAME.format('metrics_on_{}_data', company_id)
+        )
+        self.figure_cls_metrics_file_path: str = os.path.join(
+            self.model_trainer_dir,
+            training_pipeline_constants.MODEL_TRAINER_METRICS_DIR,
+            training_pipeline_constants.MODEL_TRAINER_METRICS_FIGURE_FILE_NAME.format('cls_metrics_on_{}_data', company_id)
+        )
+        self.figure_reg_metrics_file_path: str = os.path.join(
+            self.model_trainer_dir,
+            training_pipeline_constants.MODEL_TRAINER_METRICS_DIR,
+            training_pipeline_constants.MODEL_TRAINER_METRICS_FIGURE_FILE_NAME.format('reg_metrics_on_{}_data', company_id)
+        )
+        self.trained_model_file_path: str = os.path.join(
+            self.model_trainer_dir,
+            training_pipeline_constants.MODEL_TRAINER_TRAINED_MODEL_DIR, 
+            training_pipeline_constants.MODEL_TRAINER_TRAINED_MODEL_FILE_NAME.format(company_id)   
+        )
+        self.trained_model_expected_score = training_pipeline_constants.MODEL_TRAINER_EXPECTED_SCORE
+        self.trained_model_ofuf_threshold = training_pipeline_constants.MODEL_TRAINER_OVER_FIITING_UNDER_FITTING_THRESHOLD
 
 
 
-
-
-if __name__=='__main__':
-    pass
-    # obj1 = TrainingPipelineConfig(company_id=123)
-    # obj2 = DataValidationConfig(company_id=123, training_pipeline_config=obj1)
-    # attributes = [attr for attr in dir(obj2) if not attr.startswith('__')]
-    # for key, val in {attr:getattr(obj2, attr) for attr in attributes}.items():
-    #     print(f'{key}: {val}')
+# if __name__=='__main__':
+#     obj1 = TrainingPipelineConfig(company_id=123)
+#     obj2 = DataValidationConfig(company_id=123, training_pipeline_config=obj1)
+#     attributes = [attr for attr in dir(obj2) if not attr.startswith('__')]
+#     for key, val in {attr:getattr(obj2, attr) for attr in attributes}.items():
+#         print(f'{key}: {val}')

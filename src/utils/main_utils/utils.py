@@ -10,8 +10,6 @@ from src.exception.exception import CustomException
 
 
 
-
-
 def read_yaml_file(file_path: str) -> dict:
     try:
         with open(file_path, "rb") as yaml_file:
@@ -62,11 +60,11 @@ def load_numpy_array_data(file_path: str) -> np.array:
 
 def save_object(file_path: str, obj: object) -> None:
     try:
-        logging.info("Entered the save_object method of MainUtils class")
+        # logging.info("Entered the save_object method of MainUtils class")
         os.makedirs(os.path.dirname(file_path), exist_ok=True)
         with open(file_path, "wb") as file_obj:
             pickle.dump(obj, file_obj)
-        logging.info("Exited the save_object method of MainUtils class")
+        # logging.info("Exited the save_object method of MainUtils class")
     except Exception as e:
         print(CustomException(e, sys))
     
@@ -76,7 +74,7 @@ def load_object(file_path: str, ) -> object:
         if not os.path.exists(file_path):
             raise Exception(f"The file: {file_path} is not exists")
         with open(file_path, "rb") as file_obj:
-            print(file_obj)
+            # print(file_obj)
             return pickle.load(file_obj)
     except Exception as e:
         print(CustomException(e, sys))

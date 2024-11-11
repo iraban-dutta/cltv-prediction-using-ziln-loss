@@ -99,22 +99,23 @@ class DataIngestion:
             # Merging
             df_cust_lvl = pd.merge(pd.merge(df_cust_first_purchase_attr, df_cust_first_purchase_val, on='id', how='left'), df_cust_ltv_1y, on='id', how='left')
             
+
+            # Fill missing values
+            df_cust_lvl.fillna({'cltv':0}, inplace=True)
+
             # Filtering out outliers
             cltv_uppcap = df_cust_lvl['cltv'].quantile(0.99995)
-            df_cust_lvl = df_cust_lvl.query(f'cltv<{cltv_uppcap}').copy()
+            print('Upper Cap on CLTV values:', cltv_uppcap)
+            df_cust_lvl = df_cust_lvl.query(f'cltv<={cltv_uppcap}').copy()
+            # df_cust_lvl = df_cust_lvl.loc[df_cust_lvl['cltv']<cltv_uppcap].copy()
 
             # Extracting some basic features
             df_cust_lvl['start_month'] = df_cust_lvl['start_date'].dt.month
             df_cust_lvl['start_day_isweekend'] = df_cust_lvl['start_date'].dt.day_of_week.apply(lambda x: True if x>4 else False).astype('int')
             df_cust_lvl['first_purchase_amount_log'] = np.log(df_cust_lvl['first_purchase_amount'])
 
-
             # Dropping some unnecessary columns
             df_cust_lvl.drop(['start_date', 'first_purchase_productmeasure', 'txns_cnt'], axis=1, inplace=True)
-
-
-            # Fill missing values
-            df_cust_lvl.fillna({'cltv':0}, inplace=True)
 
             # Fix column data types
             df_cust_lvl['first_purchase_chain'] = df_cust_lvl['first_purchase_chain'].astype('category')

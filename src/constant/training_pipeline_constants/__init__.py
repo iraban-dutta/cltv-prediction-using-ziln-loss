@@ -6,6 +6,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 
+
 """
 defining common constant variables for training pipeline
 """
@@ -25,11 +26,11 @@ DATA_INGESTION_PSQL_PSWD: str = os.getenv("psql_password")
 DATA_INGESTION_PSQL_HOST: str = os.getenv("psql_host")
 DATA_INGESTION_PSQL_PORT: str = os.getenv("psql_port")
 DATA_INGESTION_PSQL_DB_NAME: str =  os.getenv("psql_database")
-
 DATA_INGESTION_TRAIN_TEST_SPLIT_RATIO: float = 0.2
 DATA_INGESTION_DIR: str = "data_ingestion"
 DATA_INGESTION_FEATURE_STORE_DIR: str = "feature_store"
 DATA_INGESTION_INGESTED_DIR: str = "ingested"
+
 
 
 """
@@ -50,5 +51,23 @@ DATA_TRANSFORMATION_DIR: str = "data_transformation"
 DATA_TRANSFORMATION_TRANSFORMED_DATA_DIR: str = "transformed"
 DATA_TRANSFORMATION_TRANSFORMED_OBJECT_DIR: str = "transformed_object"
 DATA_TRANSFORMATION_PREPROCESS_OBJ_FILE_NAME = "preprocessing_{}.pkl"
-DATA_TRANSFORMATION_TRAIN_FILE_NAME: str = "train_{}.npy"
-DATA_TRANSFORMATION_TEST_FILE_NAME: str = "test_{}.npy"
+DATA_TRANSFORMATION_TRAIN_FILE_NAME: str = "train_{}.pkl"
+DATA_TRANSFORMATION_TEST_FILE_NAME: str = "test_{}.pkl"
+
+
+
+"""
+Model Trainer ralated constant start with MODE TRAINER VAR NAME
+"""
+MODEL_TRAINER_DIR: str = "model_trainer"
+MODEL_TRAINER_METRICS_DIR: str = "metrics"
+MODEL_TRAINER_METRICS_REPORT_FILE_NAME: str = "report_{}_{}.yaml"
+MODEL_TRAINER_METRICS_FIGURE_FILE_NAME: str = "figure_{}_{}.png"
+MODEL_TRAINER_TRAINED_MODEL_DIR: str = "trained_model"
+MODEL_TRAINER_TRAINED_MODEL_FILE_NAME: str = "model_{}.pkl"
+MODEL_TRAINER_EXPECTED_SCORE: float = 0.6
+MODEL_TRAINER_OVER_FIITING_UNDER_FITTING_THRESHOLD: float = 0.05
+
+
+
+# TRAINING_BUCKET_NAME = "netwworksecurity"

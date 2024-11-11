@@ -6,15 +6,11 @@ from sklearn.impute import KNNImputer, SimpleImputer
 from sklearn.preprocessing import OrdinalEncoder, StandardScaler
 from sklearn.pipeline import Pipeline
 from sklearn.compose import ColumnTransformer
-
-
-from src.utils.main_utils.utils import save_numpy_array_data, save_object
-
+from src.utils.main_utils.utils import save_object, save_numpy_array_data
 from src.entity.config_entity import TrainingPipelineConfig, DataTransformationConfig
 from src.entity.artifact_entity import  DataValidationArtifact, DataTransformationArtifact
 from src.logging.logger import logging 
 from src.exception.exception import CustomException
-
 
 
 
@@ -123,6 +119,31 @@ class DataTransformation:
             print(CustomException(e, sys))
 
 
+    def get_feat_dict(self, X:pd.DataFrame, y:pd.DataFrame)->dict:
+        """
+        Generates a dictionary of features from the input DataFrame.
+
+        Args:
+            X (pd.DataFrame): The input DataFrame containing categorical and numerical columns.
+            y (np.array): Target column containing Customer LifeTime Values.
+
+        Returns:
+            dict: A dictionary with:
+                - Keys as categorical column names, and values as numpy arrays (reshaped to 2D).
+                - A key `'numeric_feats'` containing the numerical features as a numpy array (2D).
+                - A key `'initial_purchase_amount'` containing the relevant values as a numpy array (1D).
+                - A key `'cltv'` containing the relevant values as a numpy array (1D).
+        """
+        try:
+            feature_dict = {col:X[col].values.astype('int64')[:, np.newaxis] for col in CAT_COLS}
+            feature_dict['numeric_feats'] = X[NUM_COLS].values.astype('float64')
+            feature_dict['initial_purchase_amount'] = X[CALIBRATE_COL].values.ravel().astype('float64')
+            feature_dict['cltv'] = y.values.ravel().astype('float64')
+
+            return feature_dict
+    
+        except Exception as e:
+            print(CustomException(e, sys))
 
 
     def initiate_data_transformation(self)->DataTransformationArtifact:
@@ -164,18 +185,27 @@ class DataTransformation:
             X_test_trans = pd.DataFrame(transformer.transform(X_test), columns=transformed_col_names)
             logging.info("Transformation Succesfully Executed")
 
-            
-            # Convert dataframes to numpy arrays
-            arr_train = np.c_[np.array(X_train_trans), np.array(y_train)]
-            arr_test = np.c_[np.array(X_test_trans), np.array(y_test)]
 
             # Save preprocessor object
             save_object(self.data_transformation_config.transformed_object_file_path, transformer)
             # save_object("final_model/preprocessor.pkl", transformer)
 
-            # Save numpy array data
-            save_numpy_array_data(self.data_transformation_config.transformed_training_file_path, array=arr_train)
-            save_numpy_array_data(self.data_transformation_config.transformed_testing_file_path, array=arr_test)
+
+            # Convert data into dictionary 
+            dict_train = self.get_feat_dict(X=X_train_trans, y=y_train)
+            dict_test = self.get_feat_dict(X=X_test_trans, y=y_test)
+            # Save the feature dictionaries 
+            save_object(self.data_transformation_config.transformed_training_file_path, dict_train)
+            save_object(self.data_transformation_config.transformed_testing_file_path, dict_test)
+
+
+            # # Convert dataframes to numpy arrays
+            # arr_train = np.c_[np.array(X_train_trans), np.array(y_train)]
+            # arr_test = np.c_[np.array(X_test_trans), np.array(y_test)]
+            # # Save numpy array data
+            # save_numpy_array_data(self.data_transformation_config.transformed_training_file_path, array=arr_train)
+            # save_numpy_array_data(self.data_transformation_config.transformed_testing_file_path, array=arr_test)
+
 
 
             data_transformation_artifact = DataTransformationArtifact(
@@ -184,14 +214,16 @@ class DataTransformation:
                                 transformed_test_file_path=self.data_transformation_config.transformed_testing_file_path)
             logging.info("Data Transformation completed.")
 
-
             return data_transformation_artifact
-
-
-            # # DEBUG:
+            
+            # DEBUG:
             # print(X_train_trans.head(2))
             # print(X_train_trans.info())
             # print(X_test_trans.info())
+
+            # for k, v in dict_train.items():
+            #     print(k, v.shape, v.dtype)
+
             # for col in CAT_COLS:
             #     print(col)
             #     print('Before Transformation:', X_train[col].nunique())
@@ -204,6 +236,8 @@ class DataTransformation:
             #     print('After Transformation:', X_test_trans[col].nunique())
             #     print('Unknown Categories:', (X_test_trans[col]==-123).any())
             #     print('-'*50)
+
+            # return data_transformation_artifact
 
 
         except Exception as e:
